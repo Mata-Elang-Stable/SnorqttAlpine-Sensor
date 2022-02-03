@@ -149,13 +149,32 @@ def get_packet_info_from_ethernet_data(eth: Ethernet) -> dict:
         dict: packet information
     """
     # TODO: create get_packet_info_from_ethernet_data() function
-    pass
+    ip = eth.data
+    len = ip.len
+
+    if eth.type == dpkt.ethernet.ETH_TYPE_IP6:
+        hop_lim = ip.hlim
+        return {"len": len, "hop_limit": hop_lim}
+
+    elif eth.type == dpkt.ethernet.ETH_TYPE_IP:
+        do_not_fragment = bool(ip.off & dpkt.ip.IP_DF)
+        more_fragments = bool(ip.off & dpkt.ip.IP_MF)
+        fragment_offset = ip.off & dpkt.ip.IP_OFFMASK
+
+        ttl = ip.ttl
+        DF = do_not_fragment
+        MF = more_fragments
+        offset = fragment_offset
+        return {"len": len, "ttl": ttl, "DF": DF, "MF": MF, "offset": offset}
+    
+    else:
+        return {"not_supported_packet": "IP Packet unsupported"}
 
 def test_get_packet_info_from_ethernet_data():
     # TODO: create unit test for get_packet_info_from_ethernet_data() function
     pass
 
-def get_ip_detail_from_ethernet_data(eth: Ethernet) -> Tuple(str, str):
+def get_ip_detail_from_ethernet_data(eth: Ethernet) -> Tuple(str, str, str):
     """Get ip value from Ethernet var
     Args:
         eth (Ethernet): Ethernet var
