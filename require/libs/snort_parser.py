@@ -182,7 +182,25 @@ def get_ip_detail_from_ethernet_data(eth: Ethernet) -> Tuple(str, str, str):
         Tuple(str, str): ip, ip_type
     """
     # TODO: create get_ip_detail_from_ethernet_data() function
-    pass
+    ip = eth.data
+
+    if eth.type == dpkt.ethernet.ETH_TYPE_IP6:
+        ip_type = "IPv6"
+        src_ip = ip6_to_str(ip.src)
+        dest_ip = ip6_to_str(ip.dst)
+        return src_ip, dest_ip, ip_type
+
+    elif eth.type == dpkt.ethernet.ETH_TYPE_IP:
+        ip_type = "IPv4"
+        src_ip = ip_to_str(ip.src)
+        dest_ip = ip_to_str(ip.dst)
+        return src_ip, dest_ip, ip_type
+        
+    else:
+        ip_type = "Unsupported"
+        src_ip = "N/A"
+        dest_ip = "N/A"
+        return src_ip, dest_ip, ip_type
 
 def test_get_ip_detail_from_ethernet_data():
     # TODO: create unit test for get_ip_detail_from_ethernet_data() function
