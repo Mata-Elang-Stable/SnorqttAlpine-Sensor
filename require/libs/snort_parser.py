@@ -109,7 +109,7 @@ def test_get_protocol_from_id():
 
         assert get_protocol_from_id(i) == protocol
 
-def get_port_from_ethernet_data(eth: Ethernet) -> int:
+def get_port_from_ethernet_data(eth: Ethernet) -> Tuple(int, int):
     """Get port value from Ethernet var, return 0 if throw an AttributeError exception
     Args:
         eth (Ethernet): Ethernet var
@@ -117,7 +117,24 @@ def get_port_from_ethernet_data(eth: Ethernet) -> int:
         int: Port
     """
     # TODO: create get_port_from_ethernet_data() function
-    pass
+    dst_port = 0
+    src_port = 0
+
+    try:
+        eth.data.data.dport
+    except AttributeError:
+        dst_port = 0
+    else:
+        dst_port = eth.data.data.dport
+
+    try:
+        eth.data.data.sport
+    except AttributeError:
+        src_port = 0
+    else:
+        src_port = eth.data.data.sport
+
+    return src_port, dst_port
 
 def test_get_port_from_ethernet_data():
     # TODO: create unit test for test_get_port_from_ethernet_data() function
