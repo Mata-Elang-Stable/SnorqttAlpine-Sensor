@@ -84,11 +84,10 @@ def get_ip_detail_from_ethernet_data(eth: Ethernet) -> dict:
         dict: source, destination, packet_info
     """
     ethernet_data = eth.data
-    packet_length = ethernet_data.len
     protocol = get_protocol_from_id(ethernet_data.p)
 
-    source_mac_address = mac_address(ethernet_data.src)
-    destination_mac_address = mac_address(ethernet_data.src)
+    source_mac_address = mac_address(eth.src)
+    destination_mac_address = mac_address(eth.dst)
 
     if hasattr(ethernet_data.data, "sport"):
         source_port = ethernet_data.data.sport
@@ -102,6 +101,7 @@ def get_ip_detail_from_ethernet_data(eth: Ethernet) -> dict:
 
     if eth.type == dpkt.ethernet.ETH_TYPE_IP6:
         ip_type = "IPv6"
+        packet_length = ethernet_data.plen
         source_ip = ip6_to_str(ethernet_data.src)
         destination_ip = ip6_to_str(ethernet_data.dst)
 
@@ -110,6 +110,7 @@ def get_ip_detail_from_ethernet_data(eth: Ethernet) -> dict:
 
     elif eth.type == dpkt.ethernet.ETH_TYPE_IP:
         ip_type = "IPv4"
+        packet_length = ethernet_data.len
         source_ip = ip_to_str(ethernet_data.src)
         destination_ip = ip_to_str(ethernet_data.dst)
         do_not_fragment = bool(ethernet_data.off & dpkt.ip.IP_DF)
