@@ -1,10 +1,13 @@
 import json
+import logging
 import os
 import socket
 import time
+from datetime import datetime
 
 import dpkt
 import paho.mqtt.client as mqtt
+from csv_logger import CsvLogger
 from dpkt.ethernet import Ethernet
 from snortunsock import snort_listener
 from snortunsock.alert import AlertPkt
@@ -185,6 +188,30 @@ def get_snort_message(message: AlertPkt, company_name: str, device_id: str) -> d
 
 
 if __name__ == '__main__':
+    LOG_HEADER = ["timestamp", "sig_gen", "sig_id", "sig_rev", "alert_msg", "protocol", "src_ip", "src_port", "dest_ip",
+                  "dst_port", "src_mac", "dest_mac"]
+    FORMAT = '%(timestamp)s;%(sig_gen)s;%(sig_id)s;%(sig_rev)s;%(alert_msg)s;%(protocol)s;%(src_ip)s;%(src_port)s;' \
+             '%(dest_ip)s;%(dst_port)s;%(src_mac)s;%(dest_mac)s'
+    DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
+    # logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+
+    log_path = os.getenv('LOG_PATH', "/var/log/mataelang-sensor/snort.csv")
+
+    # Reference: http://manual-snort-org.s3-website-us-east-1.amazonaws.com/node21.html#SECTION00364000000000000000
+    log_csv_handler = CsvLogger(
+        filename=log_path,
+        fmt=FORMAT,
+        level=logging.DEBUG,
+        add_level_nums=None,
+        max_size=(128 * 1024 * 1024),
+        max_files=14,
+        header=LOG_HEADER,
+        datefmt=DATE_FORMAT
+    )
+
+    logger.addHandler(log_csv_handler)
+
     mqtt_broker_host = os.getenv('ALERT_MQTT_SERVER', None)
     mqtt_broker_port = os.getenv('ALERT_MQTT_PORT', 1883)
     mqtt_topic = os.getenv('ALERT_MQTT_TOPIC', 'snoqttv5')
@@ -197,5 +224,7 @@ if __name__ == '__main__':
 
     for snort_alert_message in snort_listener.start_recv("/var/log/snort/snort_alert"):
         snort_message = get_snort_message(snort_alert_message, me_company, me_device_id)
+        timestamp_h = datetime.fromtimestamp(float(snort_message["timestamp"])).strftime(DATE_FORMAT)
+        logger.warning(f"{timestamp_h} Alert Message: {snort_message['alert_msg']}", extra=snort_message)
 
         snort_mqtt.publish(mqtt_topic, json.dumps(snort_message))
