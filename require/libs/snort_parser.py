@@ -213,7 +213,7 @@ if __name__ == '__main__':
     logger.addHandler(log_csv_handler)
 
     mqtt_broker_host = os.getenv('ALERT_MQTT_SERVER', None)
-    mqtt_broker_port = os.getenv('ALERT_MQTT_PORT', 1883)
+    mqtt_broker_port = int(os.getenv('ALERT_MQTT_PORT', 1883))
     mqtt_topic = os.getenv('ALERT_MQTT_TOPIC', 'snoqttv5')
     me_device_id = os.getenv('DEVICE_ID', None)
     me_company = os.getenv('COMPANY', None)
