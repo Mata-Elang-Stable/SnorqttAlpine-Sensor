@@ -1,2 +1,5 @@
 .dockerignore
 Dockerfile
+logs/*
+.env
+venv
