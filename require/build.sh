@@ -2,7 +2,7 @@
 
 # Install required package
 apk update
-apk add --no-cache perl-net-ssleay perl-crypt-ssleay perl-libwww perl-lwp-useragent-determined perl-lwp-protocol-https pcre libpcap libdnet libtirpc libressl zlib perl supervisor bash
+apk add --no-cache perl-net-ssleay perl-crypt-ssleay perl-libwww perl-lwp-useragent-determined perl-lwp-protocol-https pcre libpcap libdnet libtirpc libressl zlib perl supervisor bash py3-pip
 apk add --no-cache build-base alpine-sdk linux-headers libpcap-dev libdnet-dev musl-dev pcre-dev bison flex net-tools wget zlib-dev python3-dev sed tar libtirpc-dev libressl-dev cmake make g++
 
 # Symlink libtirpc
@@ -10,8 +10,6 @@ ln -s /usr/include/tirpc/rpc /usr/include/rpc
 ln -s /usr/include/tirpc/netconfig.h /usr/include/netconfig.h
 
 # Install required python packages
-pip3 install --no-cache-dir --upgrade pip setuptools wheel
-hash -r pip
 pip3 install --no-cache-dir -r /root/requirements.txt
 
 # Create source code directory
@@ -80,5 +78,5 @@ cp /root/pulledpork_src/etc/*.conf /etc/snort
 mv /root/pulledpork.conf /etc/snort/
 
 # Cleaning up
-rm -rf /root/snort_src /root/daq_src /root/pulledpork_src /root/requirements.txt /root/build.sh
+rm -rf /root/snort_src /root/daq_src /root/pulledpork_src /root/requirements.txt /root/requirements-test.txt /root/build.sh
 apk del build-base alpine-sdk linux-headers libpcap-dev libdnet-dev musl-dev pcre-dev bison flex net-tools wget zlib-dev python3-dev tar libtirpc-dev libressl-dev cmake make g++
