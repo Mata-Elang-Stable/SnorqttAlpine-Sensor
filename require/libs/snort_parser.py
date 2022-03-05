@@ -150,7 +150,7 @@ def get_ip_detail_from_ethernet_data(eth: Ethernet) -> dict:
 
 
 def read_uint(data_int: int):
-    return struct.unpack('<BBBB', struct.pack('<I', data_int))
+    return struct.unpack('<BBBB', struct.pack('<I', data_int))[2]
 
 
 def get_snort_message(message: AlertPkt, company_name: str, device_id: str) -> dict:
