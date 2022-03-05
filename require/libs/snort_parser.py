@@ -3,6 +3,7 @@ import logging
 import os
 import socket
 import time
+import struct
 from datetime import datetime
 
 import dpkt
@@ -148,6 +149,10 @@ def get_ip_detail_from_ethernet_data(eth: Ethernet) -> dict:
     }
 
 
+def read_uint(data_int: int):
+    return struct.unpack('<BBBB', struct.pack('<I', data_int))
+
+
 def get_snort_message(message: AlertPkt, company_name: str, device_id: str) -> dict:
     """Get snort message object from snort socket file
     Args:
@@ -170,11 +175,11 @@ def get_snort_message(message: AlertPkt, company_name: str, device_id: str) -> d
         "alert_msg": str(alert_message),
         "company": company_name,
         "device_id": device_id,
-        "sig_gen": event.sig_generator,
-        "sig_id": event.sig_id,
-        "sig_rev": event.sig_rev,
-        "classification": event.classification,
-        "priority": event.priority,
+        "sig_gen": read_uint(event.sig_generator),
+        "sig_id": read_uint(event.sig_id),
+        "sig_rev": read_uint(event.sig_rev),
+        "classification": read_uint(event.classification),
+        "priority": read_uint(event.priority),
         "protocol": ip_detail["protocol"],
         "ip_type": ip_detail["ip_type"],
         "packet_info": ip_detail["packet_info"],
