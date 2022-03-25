@@ -28,14 +28,14 @@ tar -xvzf /root/daq.tar.gz --strip-components=1 -C /root/daq_src
 rm /root/daq.tar.gz
 
 # Compile DAQ source code
-cd /root/daq_src
+cd /root/daq_src || exit
 echo "#include <unistd.h>" > /usr/include/sys/unistd.h
 ./configure
 make
 make install
 
 # Compile Snort source code
-cd /root/snort_src
+cd /root/snort_src || exit
 ./configure --enable-sourcefire --disable-open-appid
 make
 make install
@@ -80,3 +80,15 @@ mv /root/pulledpork.conf /etc/snort/
 # Cleaning up
 rm -rf /root/snort_src /root/daq_src /root/pulledpork_src /root/requirements.txt /root/requirements-test.txt /root/build.sh
 apk del build-base alpine-sdk linux-headers libpcap-dev libdnet-dev musl-dev pcre-dev bison flex net-tools wget zlib-dev python3-dev tar libtirpc-dev libressl-dev cmake make g++
+
+# Configuring
+sed -i \
+    -e 's@^var RULE_PATH.*@var RULE_PATH /etc/snort/rules@' \
+    -e 's@^var SO_RULE_PATH.*@var SO_RULE_PATH /etc/snort/so_rules@' \
+    -e 's@^var PREPROC_RULE_PATH.*@var PREPROCRULE_PATH /etc/snort/preproc_rules@' \
+    -e 's@^var WHITE_LIST_PATH.*@var WHITE_LIST_PATH /etc/snort/rules/iplists@' \
+    -e 's@^var BLACK_LIST_PATH.*@var BLACK_LIST_PATH /etc/snort/rules/iplists@' \
+    -e 's@^\(include $.*\)@# \1@' \
+    -e "s@\# include \$RULE\_PATH\/local\.rules@include \/etc\/snort\/rules\/local\.rules@" \
+    -e '/include \/etc\/snort\/rules\/local\.rules/a include \/etc\/snort\/rules\/snort\.rules' \
+    /etc/snort/snort.conf
