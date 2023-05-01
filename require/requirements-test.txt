@@ -1,5 +1,5 @@
 paho-mqtt==1.6.1
-flask==2.0.2
+flask==2.3.2
 requests==2.27.1
 tinydb==4.6.1
 dpkt==1.9.7.2
