@@ -1,6 +1,6 @@
 paho-mqtt==1.6.1
 flask==2.0.2
-requests==2.27.1
+requests==2.31.0
 tinydb==4.6.1
 dpkt==1.9.7.2
 snortunsock==0.0.5
